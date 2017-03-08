@@ -44,11 +44,11 @@ $result = New-Object psobject @{
 
 # original_basename gets set if src and dest are dirs
 # but includes subdir if the source folder contains sub folders
-# e.g. you could get subdir/foo.txt 
+# e.g. you could get subdir/foo.txt
 
 # detect if doing recursive folder copy and create any non-existent destination sub folder
 $parent = Split-Path -Path $original_basename -Parent
-if ($parent.length -gt 0) 
+if ($parent.length -gt 0)
 {
     $dest_folder = Join-Path $dest $parent
     New-Item -Force $dest_folder -Type directory
@@ -65,8 +65,8 @@ $src_checksum = Get-FileChecksum ($src)
 
 If ($src_checksum.Equals($dest_checksum))
 {
-    # if both are "3" then both are folders, ok to copy 
-    If ($src_checksum.Equals("3")) 
+    # if both are "3" then both are folders, ok to copy
+    If ($src_checksum.Equals("3"))
     {
        # New-Item -Force creates subdirs for recursive copies
        New-Item -Force $dest -Type file
@@ -77,7 +77,7 @@ If ($src_checksum.Equals($dest_checksum))
 }
 ElseIf (! $src_checksum.Equals($dest_checksum))
 {
-    If ($src_checksum.Equals("3")) 
+    If ($src_checksum.Equals("3"))
     {
        Fail-Json (New-Object psobject) "If src is a folder, dest must also be a folder"
     }
@@ -98,7 +98,11 @@ Else
 }
 # generate return values
 
-$info = Get-Item $dest
-$result.size = $info.Length
+# get file size on file_copy operation case
+If ( $result.operation = "file_copy")
+{
+    $info = Get-Item $dest
+    $result.size = $info.Length
+}
 
 Exit-Json $result
